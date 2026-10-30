@@ -4,118 +4,116 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>心電感應</title>
-<meta name="description" content="兩個人各寫一個詞，從兩個詞之間找交集，直到寫出同一個詞。">
+<meta name="description" content="2 到 6 個人各寫一個詞，從大家的詞之間找交集，直到全部人寫出同一個詞。">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@400;700&family=Noto+Serif+TC:wght@900&family=Noto+Sans+TC:wght@400;500;700&display=swap">
-<style>*,*::before,*::after{box-sizing:border-box}body{margin:0}[hidden]{display:none!important}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
 <style>
-/* Layout: one narrow phone-first column; two "slips of paper" in each player's ink color, meeting in the middle when the words match. */
+/* Layout: one narrow phone-first column; each player writes in their own ink color, and the words meet when everyone matches. */
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
 :root{
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
   --bg:#EEF0F4; --surface:#FFFFFF; --line:#D9DDE6; --fg:#1C2130; --muted:#646B7D;
-  --a:#D9572B; --a-soft:#FBE7DE; --b:#2A63C9; --b-soft:#E1EAFA; --ok:#1F8A5B; --ok-soft:#DDF2E7;
-  --btn:#1C2130; --btn-fg:#FFFFFF;
+  --ok:#1F8A5B; --ok-soft:#DDF2E7; --btn:#1C2130; --btn-fg:#FFFFFF; --danger:#C2412B;
+  --p0:#D9572B; --s0:#FBE7DE; --p1:#2A63C9; --s1:#E1EAFA; --p2:#7E46C4; --s2:#EEE4FA;
+  --p3:#A87412; --s3:#F6ECD6; --p4:#16807F; --s4:#DBF1F0; --p5:#C2366E; --s5:#FAE1EA;
   --f-word:"LXGW WenKai TC","Kaiti TC","STKaiti","KaiTi",serif;
+  --f-title:"Noto Serif TC","Songti TC","PMingLiU",serif;
   --f-ui:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  color-scheme:light;
 }
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+@media (prefers-color-scheme: dark){:root{
   --bg:#12151D; --surface:#1B1F2A; --line:#2C3242; --fg:#EDEFF5; --muted:#9AA1B3;
-  --a:#F08359; --a-soft:#3A2219; --b:#6E9CF0; --b-soft:#1A2741; --ok:#4CC48C; --ok-soft:#15301F;
-  --btn:#EDEFF5; --btn-fg:#12151D; color-scheme:dark}}
-:root[data-theme="dark"]{
-  --bg:#12151D; --surface:#1B1F2A; --line:#2C3242; --fg:#EDEFF5; --muted:#9AA1B3;
-  --a:#F08359; --a-soft:#3A2219; --b:#6E9CF0; --b-soft:#1A2741; --ok:#4CC48C; --ok-soft:#15301F;
-  --btn:#EDEFF5; --btn-fg:#12151D; color-scheme:dark}
+  --ok:#4CC48C; --ok-soft:#15301F; --btn:#EDEFF5; --btn-fg:#12151D; --danger:#F08359;
+  --p0:#F08359; --s0:#3A2219; --p1:#6E9CF0; --s1:#1A2741; --p2:#B48AF0; --s2:#2A1F3D;
+  --p3:#E2B04F; --s3:#33290F; --p4:#4FC2C0; --s4:#123232; --p5:#F07AA6; --s5:#3B1A28;
+  color-scheme:dark}}
 html,body{min-height:100%}
-body{background:var(--bg);color:var(--fg);font-family:var(--f-ui);font-size:15px;line-height:1.6;
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--f-ui);font-size:15px;line-height:1.6;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
-.wrap{max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+.wrap{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
 header{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.brand h1{font-family:"Noto Serif TC","Songti TC","PMingLiU",serif;font-weight:900;font-size:36px;line-height:1.1;margin:0;letter-spacing:.08em}
-.brand h1 span:first-child{color:var(--a)} .brand h1 span:last-child{color:var(--b)}
+.brand h1{font-family:var(--f-title);font-weight:900;font-size:36px;line-height:1.1;margin:0;letter-spacing:.08em}
+.brand h1 span:first-child{color:var(--p0)} .brand h1 span:last-child{color:var(--p1)}
 .brand p{margin:4px 0 0;color:var(--muted);font-size:13px}
-.round-tag{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
-.players{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.pchip{position:relative;display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-width:0}
-.pchip img{width:28px;height:28px;border-radius:50%;flex:none}
+.round-tag{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.players{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:6px}
+@media (min-width:520px){.players.many{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.pchip{position:relative;display:flex;align-items:center;gap:10px;background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:9px 12px;min-width:0}
+button.pchip{font:inherit;color:inherit;text-align:left;width:100%;cursor:pointer;font-weight:400}
 .pchip .dot{width:10px;height:10px;border-radius:50%;flex:none}
-.pchip .nm{font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.pchip .txt{min-width:0;display:flex;flex-direction:column;line-height:1.35}
+.pchip .nm{font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pchip .stt{font-size:12px;color:var(--muted)}
 .pchip.locked .stt{color:var(--ok);font-weight:500}
-.players{margin-top:6px}
-button.pchip{font:inherit;color:inherit;text-align:left;width:100%;cursor:pointer;font-weight:400}
+.pchip.away{opacity:.6}.pchip.away .stt{color:var(--muted);font-weight:400}
+.pchip.empty{border-style:dashed}
 .pchip .chatic{margin-left:auto;flex:none;color:var(--muted);display:flex}
-.bubble{position:absolute;left:8px;bottom:calc(100% + 9px);max-width:calc(100% - 16px);box-sizing:border-box;padding:7px 12px;border-radius:14px;
+.bubble{position:absolute;left:8px;bottom:calc(100% + 9px);max-width:calc(100% - 16px);padding:7px 12px;border-radius:14px;
   color:#fff;font-size:14px;line-height:1.4;overflow-wrap:anywhere;z-index:5;box-shadow:0 4px 14px rgba(0,0,0,.15);animation:pop .18s ease-out both;pointer-events:none}
 .bubble::after{content:"";position:absolute;left:18px;top:100%;border:7px solid transparent;border-top-color:inherit;border-bottom:0}
-.bubble.a{background:var(--a);border-color:var(--a)} .bubble.b{background:var(--b);border-color:var(--b)}
-.bubble.fade{opacity:.0;transition:opacity .6s}
+.bubble.fade{opacity:0;transition:opacity .6s}
 @keyframes pop{from{transform:translateY(4px) scale(.96);opacity:0}to{transform:none;opacity:1}}
 .chatbar{display:flex;gap:8px;align-items:center}
 .chatbar input{flex:1;min-width:0;font:inherit;font-size:15px;padding:10px 12px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface);color:var(--fg)}
 .chatbar input:focus{outline:none;border-color:var(--fg)}
 .chatbar button{padding:10px 14px}
-.pchip.away{opacity:.6}.pchip.away .stt{color:var(--muted);font-weight:400}
-.pchip .txt{min-width:0;display:flex;flex-direction:column;line-height:1.35}
 .panel{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:22px 20px;display:flex;flex-direction:column;gap:16px}
 .eyebrow{font-size:12px;letter-spacing:.12em;color:var(--muted);text-align:center;margin:0}
 .lead{font-family:var(--f-word);font-size:26px;font-weight:700;text-align:center;margin:0;text-wrap:balance;line-height:1.3}
 .hint{color:var(--muted);font-size:13px;text-align:center;margin:0}
-.pair{display:grid;grid-template-columns:1fr auto 1fr;align-items:stretch;gap:8px}
-.slip{border-radius:12px;padding:14px 10px 16px;text-align:center;min-width:0;display:flex;flex-direction:column;gap:2px;justify-content:center}
-.slip .who{font-size:11px;letter-spacing:.1em;color:var(--muted)}
-.slip .w{font-family:var(--f-word);font-size:clamp(24px,8vw,38px);font-weight:700;line-height:1.2;overflow-wrap:anywhere}
-.slip.a{background:var(--a-soft)} .slip.a .w{color:var(--a)}
-.slip.b{background:var(--b-soft)} .slip.b .w{color:var(--b)}
-.pair .x{align-self:center;color:var(--muted);font-size:18px}
-.pair.big .slip{padding:20px 10px 22px}
-.pair.big .slip .w{font-size:clamp(30px,11vw,50px)}
-.pair.match .x{color:var(--ok);font-weight:700}
+.slips{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+@media (min-width:520px){.slips.n3,.slips.n5,.slips.n6{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.slip{border-radius:12px;padding:12px 10px 14px;text-align:center;min-width:0;display:flex;flex-direction:column;gap:2px;justify-content:center}
+.slip .who{font-size:11px;letter-spacing:.06em;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.slip .w{font-family:var(--f-word);font-size:clamp(20px,6.5vw,32px);font-weight:700;line-height:1.2;overflow-wrap:anywhere}
+.slip.voted{outline:2px solid var(--ok);outline-offset:-2px}
+.match{background:var(--ok-soft);border:2px solid var(--ok);border-radius:16px;padding:18px 12px 20px;text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center}
+.match .w{font-family:var(--f-word);font-size:clamp(36px,13vw,58px);font-weight:700;line-height:1.15;color:var(--ok);overflow-wrap:anywhere}
+.names{display:flex;flex-wrap:wrap;gap:6px 12px;justify-content:center;font-size:13px}
+.names span{display:inline-flex;align-items:center;gap:5px}
+.names i{width:8px;height:8px;border-radius:50%;display:inline-block}
+.groups{display:flex;flex-direction:column;gap:2px}
 .compose{display:flex;flex-direction:column;gap:10px}
-input[type=text]{font:inherit;font-family:var(--f-word);font-size:24px;text-align:center;padding:14px 12px;border-radius:12px;border:1.5px solid var(--line);background:var(--bg);color:var(--fg);width:100%;box-sizing:border-box}
+input[type=text]{font:inherit;font-family:var(--f-word);font-size:24px;text-align:center;padding:14px 12px;border-radius:12px;border:1.5px solid var(--line);background:var(--bg);color:var(--fg);width:100%}
 input[type=text]:focus{outline:none;border-color:var(--fg)}
 button{font:inherit;cursor:pointer;border-radius:12px;border:0;padding:13px 16px;font-weight:500}
-button:focus-visible{outline:2px solid var(--b);outline-offset:2px}
+button:focus-visible{outline:2px solid var(--p1);outline-offset:2px}
 .primary{background:var(--btn);color:var(--btn-fg)}
 .primary:disabled{opacity:.35;cursor:default}
 .ghost{background:transparent;color:var(--fg);border:1.5px solid var(--line)}
 .ghost.on{border-color:var(--ok);color:var(--ok);background:var(--ok-soft)}
-.link{background:none;color:var(--muted);padding:6px;font-size:13px;text-decoration:underline;text-underline-offset:3px;align-self:center}
-.lockedbox{text-align:center;padding:8px 0;display:flex;flex-direction:column;gap:6px}
+.link{background:none;color:var(--muted);padding:6px;font-size:13px;text-decoration:underline;text-underline-offset:3px}
+.danger{background:var(--danger);color:#fff}
+.lockedbox{text-align:center;padding:4px 0;display:flex;flex-direction:column;gap:6px}
 .lockedbox .w{font-family:var(--f-word);font-size:30px;font-weight:700}
+.waitlist{display:flex;flex-direction:column;gap:6px;align-items:center;font-size:13px;color:var(--muted)}
+.waitlist .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center}
+.waitlist button{padding:4px 10px;font-size:12px;border-radius:999px}
 .wait{display:inline-flex;gap:5px;justify-content:center}
 .wait i{width:7px;height:7px;border-radius:50%;background:var(--muted);animation:bob 1.2s infinite ease-in-out}
 .wait i:nth-child(2){animation-delay:.15s}.wait i:nth-child(3){animation-delay:.3s}
 @keyframes bob{0%,80%,100%{opacity:.25;transform:translateY(0)}40%{opacity:1;transform:translateY(-4px)}}
 .trail{display:flex;flex-direction:column;gap:8px}
 .trail h2{font-size:13px;letter-spacing:.12em;color:var(--muted);margin:0;font-weight:500}
-.trow{display:grid;grid-template-columns:28px 1fr 16px 1fr;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-variant-numeric:tabular-nums}
-.trow .n{font-size:12px;color:var(--muted)}
-.trow .ta,.trow .tb{font-family:var(--f-word);font-size:18px;font-weight:700;min-width:0;overflow-wrap:anywhere}
-.trow .ta{color:var(--a)} .trow .tb{color:var(--b);text-align:right}
-.trow .tx{color:var(--muted);font-size:12px;text-align:center}
+.trow{display:grid;grid-template-columns:24px 1fr;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 12px}
+.trow .n{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.trow .tw{display:flex;flex-wrap:wrap;gap:6px;min-width:0}
+.tag{font-family:var(--f-word);font-size:17px;font-weight:700;padding:2px 10px;border-radius:8px;overflow-wrap:anywhere}
 .trow.win{border-color:var(--ok);background:var(--ok-soft)}
-.trow.win .tx{color:var(--ok);font-weight:700}
 .banner{background:var(--ok-soft);color:var(--ok);border-radius:12px;padding:10px 14px;text-align:center;font-weight:500}
-.note{background:var(--surface);border:1px dashed var(--line);border-radius:12px;padding:12px 14px;font-size:13px;color:var(--muted)}
-.note b{color:var(--fg)}
-.confirm{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;align-items:center;font-size:13px;color:var(--muted)}
+.note{background:var(--surface);border:1px dashed var(--line);border-radius:12px;padding:12px 14px;font-size:13px;color:var(--muted);overflow-wrap:anywhere}
+.confirm{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;align-items:center;font-size:13px;color:var(--muted);text-align:center}
 .confirm button{padding:8px 14px;font-size:13px}
-.danger{background:var(--a);color:#fff}
-.won .slip{animation:meet .7s cubic-bezier(.2,.8,.2,1) both}
-.won .slip.a{--dx:-24px}.won .slip.b{--dx:24px}
-@keyframes meet{from{transform:translateX(var(--dx));opacity:.4}to{transform:none;opacity:1}}
+.won .match{animation:land .6s cubic-bezier(.2,.8,.2,1) both}
+@keyframes land{from{transform:scale(.92);opacity:.3}to{transform:none;opacity:1}}
 .modal{position:fixed;inset:0;background:rgba(10,12,18,.62);display:flex;align-items:center;justify-content:center;z-index:20;
   padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
-.sheet{background:var(--surface);border-radius:18px;padding:16px;max-width:440px;width:100%;max-height:100%;display:flex;flex-direction:column;gap:12px;box-sizing:border-box}
+.sheet{background:var(--surface);border-radius:18px;padding:16px;max-width:440px;width:100%;max-height:100%;display:flex;flex-direction:column;gap:12px}
 .sheet .imgbox{overflow:auto;border-radius:12px;border:1px solid var(--line);min-height:0;flex:1}
 .sheet img{display:block;width:100%;height:auto}
 .sheet .row{display:flex;gap:8px}.sheet .row button{flex:1}
-@media (prefers-reduced-motion: reduce){.wait i,.won .slip{animation:none}}
-</style>
-</head>
-<body>
-<style>
 .lobby{display:flex;flex-direction:column;gap:12px}
 .lobby label{font-size:13px;color:var(--muted)}
 .lobby .split{display:flex;gap:8px}
@@ -123,17 +121,19 @@ button:focus-visible{outline:2px solid var(--b);outline-offset:2px}
 .lobby input.code{font-family:var(--f-ui);letter-spacing:.3em;text-transform:uppercase;font-size:20px}
 .or{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:12px}
 .or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
-.codechip{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:6px 8px 6px 14px;font-size:13px}
+.codechip{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:5px 6px 5px 14px;font-size:13px}
 .codechip b{letter-spacing:.2em;font-variant-numeric:tabular-nums}
 .codechip button{padding:5px 10px;font-size:12px;border-radius:999px}
 .bigcode{font-size:40px;font-weight:700;letter-spacing:.3em;text-align:center;font-variant-numeric:tabular-nums;margin:0}
+@media (prefers-reduced-motion: reduce){.wait i,.won .match,.bubble{animation:none}}
 </style>
-
+</head>
+<body>
 <div class="wrap">
   <header>
     <div class="brand">
       <h1><span>心電</span><span>感應</span></h1>
-      <p>兩個人，各寫一個詞，直到寫出同一個</p>
+      <p>大家各寫一個詞，直到全部人寫出同一個</p>
     </div>
     <div class="round-tag" id="roundTag"></div>
   </header>
@@ -149,7 +149,7 @@ button:focus-visible{outline:2px solid var(--b);outline-offset:2px}
 <div id="modal" class="modal" hidden></div>
 
 <script type="module">
-// ==== 把 Firebase 給你的設定貼在這裡 ====
+// ==== Firebase 設定 ====
 const firebaseConfig = {
   apiKey: "AIzaSyBDKHTk8ri3yHh13WCHjeNvHW3OkRCmGCA",
   authDomain: "sayyyy-it.firebaseapp.com",
@@ -159,11 +159,12 @@ const firebaseConfig = {
   messagingSenderId: "798787742080",
   appId: "1:798787742080:web:cbd05d726c08c2859eb965"
 };
-// =========================================
+// =======================
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getDatabase, ref, onValue, set, update, remove, get, runTransaction, onDisconnect, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import { getDatabase, ref, onValue, set, remove, get, runTransaction, onDisconnect, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
+const MAX = 6;
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const norm = s => String(s||"").normalize("NFKC").replace(/[\s\p{P}\p{S}]/gu,"").toLowerCase();
@@ -173,7 +174,7 @@ let pid = ls.get("tp_pid");
 if (!pid){ pid = "p" + Math.random().toString(36).slice(2, 12) + Date.now().toString(36); ls.set("tp_pid", pid); }
 
 const st = { db:null, code:null, room:null, players:[], name: ls.get("tp_name") || "", fatal:null, busy:false, err:null,
-  confirmLeave:false, confirmReset:false, chatOpen:false, offset:0, preview:null, imgMsg:"", unsub:null, lobbyMsg:"" };
+  confirmLeave:false, confirmReset:false, confirmKick:null, chatOpen:false, offset:0, preview:null, imgMsg:"", unsub:null, lobbyMsg:"", presenceOn:false };
 
 const last = {};
 function put(id, html){
@@ -181,7 +182,8 @@ function put(id, html){
   if (last[id] === html) return; last[id] = html; $(id).innerHTML = html;
 }
 const now = () => Date.now() + st.offset;
-const pRef = (sub="") => ref(st.db, `rooms/${st.code}/players/${pid}${sub ? "/" + sub : ""}`);
+const R = p => ref(st.db, `rooms/${st.code}/${p}`);
+const pRef = (sub="") => R(`players/${pid}${sub ? "/" + sub : ""}`);
 
 async function write(fn){
   st.busy = true; render();
@@ -190,61 +192,90 @@ async function write(fn){
   st.busy = false; render();
 }
 
+// ---------- people ----------
+function gameMembers(){ const g = st.room && st.room.game; return (g && g.members) || {}; }
+function info(id){
+  const p = st.players.find(x => x.id === id), m = gameMembers()[id];
+  const c = Number(p && p.c != null ? p.c : m && m.c != null ? m.c : 0);
+  return { name: (p && p.name) || (m && m.name) || "玩家", c: Number.isFinite(c) ? ((c % 6) + 6) % 6 : 0 };
+}
+const label = id => info(id).name + (id === pid ? "（你）" : "");
+
 // ---------- game logic ----------
 function derive(){
-  const ps = st.players, mi = ps.findIndex(p => p.id === pid);
-  const A = ps[0], B = ps[1];
-  if (!A || !B) return { phase:"waiting", mi };
-  const get_ = (p, f, k) => (p[f] || {})[k];
-  let g = Math.max(1, Number(A.reset)||1, Number(B.reset)||1);
-  while (get_(A,"again","g"+g) && get_(B,"again","g"+g)) g++;
+  const room = st.room || {}, g = room.game;
+  if (!g || !g.n) return { phase:"waiting" };
+  const present = new Set(st.players.map(p => p.id));
+  const n = g.n, M = g.members || {};
+  const ids = Object.keys(M).sort((a, b) => (M[a].o||0) - (M[b].o||0));
+  const active = ids.filter(id => !M[id].out && present.has(id));
+  const amIn = active.includes(pid);
+  const W = (room.words || {})["g" + n] || {}, S = (room.same || {})["g" + n] || {};
   const rounds = [];
-  for (let r = 1; r < 500; r++){
-    const k = `g${g}r${r}`, a = get_(A,"w",k), b = get_(B,"w",k);
-    if (a == null || b == null) return { phase:"play", g, r, k, rounds, a, b, mi, A, B };
-    const exact = norm(a) === norm(b), sameA = !!get_(A,"same",k), sameB = !!get_(B,"same",k);
-    const row = { r, k, a, b, exact, sameA, sameB, agreed: sameA && sameB };
+  for (let r = 1; r < 300; r++){
+    const wr = W["r" + r] || {}, sr = S["r" + r] || {};
+    const part = ids.filter(id => active.includes(id) || wr[id] != null);
+    const done = part.length >= 2 && part.every(id => wr[id] != null);
+    if (!done){
+      if (active.length < 2) return { phase:"short", n, rounds, active, amIn };
+      return { phase:"play", n, r, rounds, active, amIn, wr, part };
+    }
+    const words = part.map(id => ({ id, w: String(wr[id]) }));
+    const exact = words.every(x => norm(x.w) === norm(words[0].w));
+    const voters = part.filter(id => active.includes(id));
+    const agreed = voters.length >= 2 && voters.every(id => sr[id]);
+    const row = { r, words, exact, agreed, sr, voters };
     rounds.push(row);
-    if (exact || row.agreed) return { phase:"won", g, r, rounds, mi, A, B, againA: !!get_(A,"again","g"+g), againB: !!get_(B,"again","g"+g) };
+    if (exact || agreed) return { phase:"won", n, r, rounds, active, amIn, row };
   }
-  return { phase:"play", g, r:500, rounds, mi, A, B };
+  return { phase:"play", n, r:300, rounds, active, amIn, wr:{}, part:active };
 }
-const nameOf = (p, i) => { const n = (p && p.name) || ("玩家 " + (i + 1)); return p && p.id === pid ? n + "（你）" : n; };
 
 // ---------- rendering ----------
 function chips(d){
-  return [0,1].map(i => {
-    const p = st.players[i];
-    if (!p) return `<div class="pchip"><span class="dot" style="background:var(--line)"></span><div class="txt"><span class="nm">等待加入</span><span class="stt">空位</span></div></div>`;
+  const list = st.players.slice(0, MAX);
+  const out = list.map(p => {
+    const { c } = info(p.id);
     let stt = "在房間裡", cls = "";
-    if (d.phase === "play"){ const m = i === 0 ? d.a : d.b; stt = m != null ? "已鎖定答案" : "思考中…"; if (m != null) cls = "locked"; }
-    if (d.phase === "won"){ const ag = i === 0 ? d.againA : d.againB; stt = ag ? "想再玩一局" : "看結果中"; if (ag) cls = "locked"; }
-    if (p.online === false){ stt = (cls ? stt + " · " : "") + "不在線上"; cls += " away"; }
+    if (d.phase === "play"){
+      if (d.active.includes(p.id)){ const done = d.wr[p.id] != null; stt = done ? "已鎖定答案" : "思考中…"; if (done) cls = "locked"; }
+      else stt = "觀戰中，下一局加入";
+    } else if (d.phase !== "waiting" && !d.active.includes(p.id)) stt = "下一局加入";
+    if (p.online === false){ stt = "不在線上"; cls += " away"; }
     const sd = p.say, age = sd && sd.at ? now() - sd.at : Infinity;
-    const bubble = sd && sd.text && age < 9000 && age > -5000 ? `<span class="bubble ${i?"b":"a"} ${age > 8300 ? "fade" : ""}">${esc(sd.text)}</span>` : "";
-    const inner = `${bubble}<span class="dot" style="background:var(--${i?"b":"a"})"></span><div class="txt"><span class="nm">${esc(nameOf(p,i))}</span><span class="stt">${stt}</span></div>`;
-    const style = `style="border-color:var(--${i?"b":"a"})"`;
+    const bubble = sd && sd.text && age < 9000 && age > -5000 ? `<span class="bubble ${age > 8300 ? "fade" : ""}" style="background:var(--p${c});border-color:var(--p${c})">${esc(sd.text)}</span>` : "";
+    const inner = `${bubble}<span class="dot" style="background:var(--p${c})"></span><div class="txt"><span class="nm">${esc(label(p.id))}</span><span class="stt">${stt}</span></div>`;
+    const style = `style="border-color:var(--p${c})"`;
     if (p.id === pid) return `<button type="button" class="pchip ${cls}" data-act="chat" aria-label="點這裡打字聊天" ${style}>${inner}<span class="chatic" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.4-5A8 8 0 1 1 21 12z"/></svg></span></button>`;
     return `<div class="pchip ${cls}" ${style}>${inner}</div>`;
-  }).join("");
+  });
+  if (d.phase === "waiting" && list.length < MAX) out.push(`<div class="pchip empty"><span class="dot" style="background:var(--line)"></span><div class="txt"><span class="nm">還可以加入</span><span class="stt">${list.length} / ${MAX} 人</span></div></div>`);
+  $("players").classList.toggle("many", out.length > 2);
+  return out.join("");
 }
-function pairHTML(a, b, d, extra=""){
-  return `<div class="pair ${extra}">
-    <div class="slip a"><span class="who">${esc(nameOf(d.A,0))}</span><span class="w">${esc(a)}</span></div>
-    <span class="x">${extra.includes("match") ? "＝" : "×"}</span>
-    <div class="slip b"><span class="who">${esc(nameOf(d.B,1))}</span><span class="w">${esc(b)}</span></div></div>`;
+function slipsHTML(words, sr){
+  return `<div class="slips n${words.length}">` + words.map(x => { const { c } = info(x.id);
+    return `<div class="slip ${sr && sr[x.id] ? "voted" : ""}" style="background:var(--s${c})"><span class="who">${esc(label(x.id))}</span><span class="w" style="color:var(--p${c})">${esc(x.w)}</span></div>`; }).join("") + `</div>`;
+}
+function namesHTML(ids){ return `<div class="names">` + ids.map(id => `<span><i style="background:var(--p${info(id).c})"></i>${esc(label(id))}</span>`).join("") + `</div>`; }
+function groupsHTML(words){
+  const g = {};
+  for (const x of words){ const k = norm(x.w); (g[k] = g[k] || []).push(x); }
+  const lines = Object.values(g).filter(a => a.length >= 2 && a.length < words.length).map(a => `有 ${a.length} 人寫了「${esc(a[0].w)}」`);
+  return lines.length ? `<div class="groups">${lines.map(l => `<p class="hint" style="color:var(--ok)">${l}</p>`).join("")}</div>` : "";
 }
 function trailHTML(rows, winR){
   if (!rows.length) return "";
-  return `<h2>聯想軌跡</h2>` + rows.map(x => `<div class="trow ${x.r===winR?"win":""}"><span class="n">${x.r}</span><span class="ta">${esc(x.a)}</span><span class="tx">${x.r===winR?"＝":"×"}</span><span class="tb">${esc(x.b)}</span></div>`).join("");
+  return `<h2>聯想軌跡</h2>` + rows.map(x => `<div class="trow ${x.r === winR ? "win" : ""}"><span class="n">${x.r}</span><div class="tw">${x.words.map(w => { const { c } = info(w.id);
+    return `<span class="tag" style="color:var(--p${c});background:var(--s${c})" title="${esc(label(w.id))}">${esc(w.w)}</span>`; }).join("")}</div></div>`).join("");
 }
 const shareLink = () => location.origin + location.pathname + "?room=" + st.code;
 
 function renderLobby(){
   put("players",""); put("chat",""); put("roundTag",""); put("foot",""); $("trail").hidden = true;
-  if (last.main && last.main.startsWith("<!--lobby-->")) return; // keep inputs alive while typing
-  put("main", `<!--lobby--><p class="eyebrow">兩人遊戲</p><p class="lead">一人寫一個詞，<br>寫到一樣就贏</p>
-    <p class="hint">第一輪自由寫。之後每一輪，都要想一個能同時連到上一輪兩個詞的新詞。</p>
+  if (last.main && last.main.startsWith("<!--lobby-->")) return;
+  put("main", `<!--lobby--><p class="eyebrow">2 到 ${MAX} 人</p><p class="lead">每人寫一個詞，<br>全部人寫到一樣就贏</p>
+    <p class="hint">第一輪自由寫。之後每一輪，都要想一個能連到上一輪所有詞的新詞。</p>
     <form class="lobby" id="lobby-form">
       <label for="nick">你的暱稱</label>
       <input type="text" id="nick" maxlength="12" autocomplete="off" placeholder="例如：xc" value="${esc(st.name)}">
@@ -261,74 +292,101 @@ function render(){
   if (!st.code){ renderLobby(); const m = $("lobbymsg"); if (m) m.textContent = st.lobbyMsg; return; }
   if (!st.room){ put("main", `<p class="eyebrow">連線中</p><p class="lead">正在進入房間 ${esc(st.code)}…</p>`); return; }
   const d = derive();
+  const inRoom = st.players.some(p => p.id === pid);
   put("players", chips(d));
-  put("chat", st.chatOpen && d.mi >= 0 ? `<form class="chatbar" id="chat-form"><input type="text" id="chat-input" maxlength="40" autocomplete="off" enterkeyhint="send" placeholder="想說什麼？會顯示在你的名字上面" aria-label="聊天訊息"><button class="primary" type="submit">送出</button><button class="ghost" type="button" data-act="chat-close" aria-label="關閉聊天">✕</button></form>` : "");
+  put("chat", st.chatOpen && inRoom ? `<form class="chatbar" id="chat-form"><input type="text" id="chat-input" maxlength="40" autocomplete="off" enterkeyhint="send" placeholder="想說什麼？會顯示在你的名字上面" aria-label="聊天訊息"><button class="primary" type="submit">送出</button><button class="ghost" type="button" data-act="chat-close" aria-label="關閉聊天">✕</button></form>` : "");
   const codeChip = `<span class="codechip">房間 <b>${esc(st.code)}</b><button class="ghost" data-act="share">邀請</button></span>`;
-  put("roundTag", (d.phase === "play" ? `第 ${d.g} 局 · 第 ${d.r} 輪 ` : d.phase === "won" ? `第 ${d.g} 局 · 完成 ` : "") + codeChip);
+  put("roundTag", (d.phase === "play" ? `第 ${d.n} 局 · 第 ${d.r} 輪` : d.phase === "won" ? `第 ${d.n} 局 · 完成` : "") + codeChip);
   const err = st.err ? `<div class="note">${esc(st.err)}</div>` : "";
-  const amPlayer = d.mi === 0 || d.mi === 1;
-  const canReset = amPlayer && (d.phase === "won" || (d.phase === "play" && (d.rounds.length || d.a != null || d.b != null)));
-  put("foot", st.confirmLeave
-    ? `<div class="confirm">離開後你在這個房間的紀錄會刪除。<button class="danger" data-act="leave-yes">確定離開</button><button class="ghost" data-act="leave-no">取消</button></div>`
-    : st.confirmReset
-    ? `<div class="confirm">兩個人都會回到新一局的第一輪，這一局沒寫完的詞會清掉。<button class="danger" data-act="reset-yes">重新開始</button><button class="ghost" data-act="reset-no">取消</button></div>`
-    : `<div class="confirm">${canReset ? `<button class="link" data-act="reset">兩人一起重新開始</button>` : ""}<button class="link" data-act="${d.mi >= 0 ? "leave" : "lobby"}">${d.mi >= 0 ? "離開房間" : "回到首頁"}</button></div>`);
+  const canReset = d.amIn && d.phase === "play" && (d.rounds.length || Object.keys(d.wr).length);
+  put("foot", !inRoom ? `<div class="confirm"><button class="link" data-act="lobby">回到首頁</button></div>`
+    : st.confirmLeave ? `<div class="confirm">確定要離開這個房間嗎？<button class="danger" data-act="leave-yes">確定離開</button><button class="ghost" data-act="leave-no">取消</button></div>`
+    : st.confirmReset ? `<div class="confirm">所有人會回到新一局的第一輪，這一局會直接結束。<button class="danger" data-act="reset-yes">重新開始</button><button class="ghost" data-act="reset-no">取消</button></div>`
+    : `<div class="confirm">${canReset ? `<button class="link" data-act="reset">全員重新開始</button>` : ""}<button class="link" data-act="leave">離開房間</button></div>`);
 
-  if (d.mi < 0){
+  if (!inRoom){
     $("trail").hidden = true;
-    put("main", st.players.length >= 2
-      ? `<p class="eyebrow">房間已滿</p><p class="lead">這間已經有兩個人在玩了</p><p class="hint">回首頁開一間新的房間吧。</p>`
+    put("main", st.players.length >= MAX
+      ? `<p class="eyebrow">房間已滿</p><p class="lead">這間已經有 ${MAX} 個人了</p><p class="hint">回首頁開一間新的房間吧。</p>`
       : `<p class="eyebrow">房間 ${esc(st.code)}</p><p class="lead">要加入這個房間嗎？</p><button class="primary" data-act="join-here" ${st.busy?"disabled":""}>以「${esc(st.name || "玩家")}」加入</button>${err}`);
     return;
   }
+  const count = Math.min(st.players.length, MAX);
+  const startBtn = (txt) => count >= 2
+    ? `<button class="primary" data-act="start" ${st.busy?"disabled":""}>${txt}（${count} 人）</button>`
+    : `<p class="hint">至少要 2 個人才能開始。</p>`;
+
   if (d.phase === "waiting"){
     $("trail").hidden = true;
     put("main", `<p class="eyebrow">等朋友加入</p><p class="bigcode">${esc(st.code)}</p>
-      <p class="hint">把這組代碼給朋友，或直接傳邀請連結給他。</p>
-      <button class="primary" data-act="share">傳邀請連結</button>
-      <div class="wait" aria-hidden="true" style="align-self:center"><i></i><i></i><i></i></div>${err}`);
+      <p class="hint">把代碼或邀請連結傳給朋友，最多 ${MAX} 人。人到齊後，任何一個人按開始都可以。</p>
+      <button class="ghost" data-act="share">傳邀請連結</button>
+      ${startBtn("開始遊戲")}${err}`);
+    return;
+  }
+  if (d.phase === "short"){
+    $("trail").hidden = d.rounds.length === 0; put("trail", trailHTML(d.rounds, -1));
+    put("main", `<p class="eyebrow">人數不夠了</p><p class="lead">這一局只剩一個人</p>
+      <p class="hint">其他人離開了房間。等朋友回來，或邀請新朋友加入後重新開始。</p>
+      <button class="ghost" data-act="share">傳邀請連結</button>${startBtn("重新開始")}${err}`);
     return;
   }
   if (d.phase === "won"){
-    const w = d.rounds[d.rounds.length - 1], mineAgain = d.mi === 0 ? d.againA : d.againB;
-    const how = w.exact ? `你們在第 ${w.r} 輪寫出了同一個詞` : `第 ${w.r} 輪，你們都認定意思一樣`;
+    const w = d.row, ids = w.words.map(x => x.id), newbies = st.players.slice(0, MAX).filter(p => !d.active.includes(p.id)).length;
+    const how = w.exact ? `${ids.length} 個人在第 ${w.r} 輪寫出了同一個詞` : `第 ${w.r} 輪，大家都認定意思一樣`;
     put("main", `<div class="won" style="display:flex;flex-direction:column;gap:16px">
-      <p class="eyebrow">同步成功</p><p class="lead">${how}</p>
-      ${pairHTML(w.a, w.b, d, "big match")}
-      <p class="hint">共 ${w.r} 輪${w.r===1?"，一次就中，太有默契了":""}</p>
+      <p class="eyebrow">全員同步成功</p><p class="lead">${how}</p>
+      ${w.exact ? `<div class="match"><span class="w">${esc(w.words[0].w)}</span>${namesHTML(ids)}</div>` : slipsHTML(w.words)}
+      <p class="hint">共 ${w.r} 輪${w.r === 1 ? "，一次就中，太有默契了" : ""}</p>
       <button class="ghost" data-act="image">儲存紀錄圖片</button>
-      ${mineAgain ? `<div class="banner">已準備好，等對方也按「再玩一局」</div>` : `<button class="primary" data-act="again" ${st.busy?"disabled":""}>再玩一局</button>`}${err}</div>`);
+      ${startBtn("再玩一局")}
+      ${newbies ? `<p class="hint">新加入的朋友會一起玩下一局。</p>` : ""}${err}</div>`);
     $("trail").hidden = false; put("trail", trailHTML(d.rounds, w.r));
     return;
   }
-  const mine = d.mi === 0 ? d.a : d.b, prev = d.rounds[d.rounds.length - 1];
+
+  // play
+  const prev = d.rounds[d.rounds.length - 1];
   let top;
   if (!prev){
-    top = `<p class="eyebrow">第一輪</p><p class="lead">寫下腦中第一個浮現的詞</p><p class="hint">送出後不能修改，對方送出前你們都看不到彼此的詞。</p>`;
+    top = `<p class="eyebrow">第一輪</p><p class="lead">寫下腦中第一個浮現的詞</p><p class="hint">送出後不能修改，全部人都送出後才會一起揭曉。</p>`;
   } else {
-    const myVote = d.mi === 0 ? prev.sameA : prev.sameB, theirVote = d.mi === 0 ? prev.sameB : prev.sameA;
-    top = `<p class="eyebrow">上一輪 · 第 ${prev.r} 輪</p>${pairHTML(prev.a, prev.b, d)}
-      <p class="lead" style="font-size:22px">想一個能同時連到這兩個詞的詞</p>
-      <button class="ghost ${myVote?"on":""}" data-act="same" data-k="${prev.k}" data-v="${myVote?0:1}">${myVote ? "✓ 你認為意思一樣（再按取消）" : "其實這兩個詞意思一樣"}</button>
-      ${theirVote && !myVote ? `<p class="hint" style="color:var(--ok)">對方覺得這兩個詞意思一樣。你也同意的話，就算成功。</p>` : myVote && !theirVote ? `<p class="hint">兩個人都按了才算成功。</p>` : ""}`;
+    const myVote = !!prev.sr[pid], votes = prev.voters.filter(id => prev.sr[id]).length;
+    const canVote = d.amIn && prev.voters.includes(pid);
+    top = `<p class="eyebrow">上一輪 · 第 ${prev.r} 輪</p>${slipsHTML(prev.words, prev.sr)}${groupsHTML(prev.words)}
+      <p class="lead" style="font-size:22px">想一個能連到上面${prev.words.length > 2 ? "所有" : "兩個"}詞的詞</p>
+      ${canVote ? `<button class="ghost ${myVote ? "on" : ""}" data-act="same" data-r="${prev.r}" data-v="${myVote ? 0 : 1}">${myVote ? "✓ 你認為意思都一樣（再按取消）" : "其實大家寫的意思都一樣"}</button>` : ""}
+      ${votes ? `<p class="hint" style="color:var(--ok)">${votes} / ${prev.voters.length} 人覺得意思都一樣${votes < prev.voters.length ? "，全部人都按了才算成功" : ""}</p>` : ""}`;
   }
-  const compose = mine != null
-    ? `<div class="lockedbox"><span class="hint">你鎖定的是</span><span class="w" style="color:var(--${d.mi?"b":"a"})">${esc(mine)}</span><div class="hint">等對方送出 <span class="wait" aria-hidden="true"><i></i><i></i><i></i></span></div></div>`
-    : `<form class="compose" id="f-${d.k}"><label for="word-${d.k}" class="hint">你的詞</label>
-       <input type="text" id="word-${d.k}" maxlength="20" autocomplete="off" enterkeyhint="send" placeholder="輸入一個詞">
-       <button class="primary" type="submit" ${st.busy?"disabled":""}>鎖定答案</button></form>`;
-  if (!$("top")){ $("main").innerHTML = `<div id="top" style="display:flex;flex-direction:column;gap:14px"></div><div id="compose"></div><div id="perr"></div>`; for (const k of ["top","compose","perr"]) delete last[k]; }
+  let compose;
+  const pending = d.part.filter(id => d.wr[id] == null);
+  if (!d.amIn){
+    compose = `<div class="note" style="text-align:center">這一局進行中，你在觀戰。下一局開始時就會一起玩。<br>已送出：${d.part.length - pending.length} / ${d.part.length} 人</div>`;
+  } else if (d.wr[pid] != null){
+    const { c } = info(pid);
+    const waitRows = pending.map(id => st.confirmKick === id
+      ? `<div class="row">把 ${esc(label(id))} 移出這一局？<button class="danger" data-act="kick-yes" data-id="${esc(id)}">移出</button><button class="ghost" data-act="kick-no">取消</button></div>`
+      : `<div class="row"><span>還在想：${esc(label(id))}</span><button class="ghost" data-act="kick" data-id="${esc(id)}">移出這局</button></div>`).join("");
+    compose = `<div class="lockedbox"><span class="hint">你鎖定的是</span><span class="w" style="color:var(--p${c})">${esc(d.wr[pid])}</span>
+      <div class="hint">等其他人送出（${d.part.length - pending.length} / ${d.part.length}）<span class="wait" aria-hidden="true"><i></i><i></i><i></i></span></div></div>
+      ${pending.length ? `<div class="waitlist">${waitRows}</div>` : ""}`;
+  } else {
+    compose = `<form class="compose" id="f-${d.n}-${d.r}"><label for="word-${d.n}-${d.r}" class="hint">你的詞</label>
+      <input type="text" id="word-${d.n}-${d.r}" maxlength="20" autocomplete="off" enterkeyhint="send" placeholder="輸入一個詞">
+      <button class="primary" type="submit" ${st.busy ? "disabled" : ""}>鎖定答案</button></form>`;
+  }
+  if (!$("top")){ $("main").innerHTML = `<div id="top" style="display:flex;flex-direction:column;gap:14px"></div><div id="compose" style="display:flex;flex-direction:column;gap:12px"></div><div id="perr"></div>`; for (const k of ["top","compose","perr"]) delete last[k]; }
   put("top", top); put("compose", compose); put("perr", err); last.main = null;
   $("trail").hidden = d.rounds.length === 0; put("trail", trailHTML(d.rounds, -1));
 }
 
 // ---------- rooms ----------
 const ALPH = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-const newCode = () => Array.from({length:4}, () => ALPH[Math.floor(Math.random()*ALPH.length)]).join("");
+const newCode = () => Array.from({length:4}, () => ALPH[Math.floor(Math.random() * ALPH.length)]).join("");
 
 function enterRoom(code){
   if (st.unsub) st.unsub();
-  st.code = code; st.room = null; st.presenceOn = false; st.players = []; st.chatOpen = false;
+  st.code = code; st.room = null; st.players = []; st.chatOpen = false; st.presenceOn = false;
   history.replaceState(null, "", "?room=" + code);
   st.unsub = onValue(ref(st.db, `rooms/${code}`), snap => {
     const v = snap.val();
@@ -351,13 +409,25 @@ async function joinRoom(code){
   const res = await runTransaction(ref(st.db, `rooms/${code}/players`), cur => {
     cur = cur || {};
     if (cur[pid]){ cur[pid].name = name; cur[pid].online = true; return cur; }
-    if (Object.keys(cur).length >= 2) return;
-    cur[pid] = { name, joinedAt: Date.now(), online: true };
+    const ids = Object.keys(cur);
+    if (ids.length >= MAX) return;
+    const used = new Set(ids.map(i => Number(cur[i].c)));
+    let c = 0; while (used.has(c) && c < MAX) c++;
+    cur[pid] = { name, joinedAt: Date.now(), online: true, c };
     return cur;
   });
   if (!res.committed) return false;
-  onDisconnect(pRef("online")).set(false);
+  onDisconnect(ref(st.db, `rooms/${code}/players/${pid}/online`)).set(false);
   return true;
+}
+async function startGame(){
+  const g = st.room && st.room.game, expected = (g && g.n) || 0;
+  const mem = {};
+  st.players.slice(0, MAX).forEach(p => { const i = info(p.id); mem[p.id] = { name: i.name, c: i.c, o: p.joinedAt || 0 }; });
+  await runTransaction(R("game"), cur => {
+    if (((cur && cur.n) || 0) !== expected) return;
+    return { n: expected + 1, members: mem, at: Date.now() };
+  });
 }
 
 // ---------- events ----------
@@ -367,22 +437,31 @@ document.addEventListener("click", async ev => {
   if (act === "share"){
     const url = shareLink();
     if (navigator.share){ try { await navigator.share({ title:"心電感應", text:`來玩心電感應！房間代碼 ${st.code}`, url }); return; } catch(e){ if (e && e.name === "AbortError") return; } }
-    try { await navigator.clipboard.writeText(url); btn.textContent = "已複製連結"; setTimeout(() => render(), 1500); }
+    try { await navigator.clipboard.writeText(url); btn.textContent = "已複製連結"; setTimeout(() => { delete last.main; delete last.roundTag; render(); }, 1500); }
     catch(e){ st.err = "邀請連結：" + url; render(); }
   } else if (act === "join-here"){
     write(async () => { if (!(await joinRoom(st.code))) throw new Error("full"); });
+  } else if (act === "start"){
+    write(startGame);
   } else if (act === "same"){
-    const k = btn.dataset.k, v = btn.dataset.v === "1"; write(() => set(pRef("same/" + k), v));
-  } else if (act === "again"){
-    const d = derive(); write(() => set(pRef("again/g" + d.g), true));
+    const d = derive(); const r = btn.dataset.r, v = btn.dataset.v === "1";
+    write(() => set(R(`same/g${d.n}/r${r}/${pid}`), v ? true : null));
   } else if (act === "chat"){ st.chatOpen = !st.chatOpen; render(); if (st.chatOpen){ const el = $("chat-input"); if (el) el.focus(); } }
   else if (act === "chat-close"){ st.chatOpen = false; render(); }
+  else if (act === "kick"){ st.confirmKick = btn.dataset.id; render(); }
+  else if (act === "kick-no"){ st.confirmKick = null; render(); }
+  else if (act === "kick-yes"){ const id = btn.dataset.id; st.confirmKick = null; write(() => set(R(`game/members/${id}/out`), true)); }
   else if (act === "reset"){ st.confirmReset = true; render(); }
   else if (act === "reset-no"){ st.confirmReset = false; render(); }
-  else if (act === "reset-yes"){ const d = derive(); st.confirmReset = false; write(() => set(pRef("reset"), (d.g || 1) + 1)); }
+  else if (act === "reset-yes"){ st.confirmReset = false; write(startGame); }
   else if (act === "leave"){ st.confirmLeave = true; render(); }
   else if (act === "leave-no"){ st.confirmLeave = false; render(); }
-  else if (act === "leave-yes"){ st.confirmLeave = false; const code = st.code; onDisconnect(pRef("online")).cancel(); await remove(ref(st.db, `rooms/${code}/players/${pid}`)).catch(()=>{}); leaveToLobby(); }
+  else if (act === "leave-yes"){
+    st.confirmLeave = false; const code = st.code;
+    onDisconnect(pRef("online")).cancel();
+    await remove(ref(st.db, `rooms/${code}/players/${pid}`)).catch(() => {});
+    leaveToLobby();
+  }
   else if (act === "lobby"){ leaveToLobby(); }
   else if (act === "image"){ openPreview(); }
   else if (act === "img-close"){ closePreview(); }
@@ -395,17 +474,17 @@ document.addEventListener("submit", async ev => {
   if (form.id === "lobby-form"){
     const mode = (ev.submitter && ev.submitter.dataset.mode) || "create";
     const name = ($("nick").value || "").trim().slice(0, 12);
-    if (!name){ st.lobbyMsg = "先取一個暱稱吧。"; $("lobbymsg").textContent = st.lobbyMsg; $("nick").focus(); return; }
-    st.name = name; ls.set("tp_name", name);
     const msg = t => { st.lobbyMsg = t; $("lobbymsg").textContent = t; };
+    if (!name){ msg("先取一個暱稱吧。"); $("nick").focus(); return; }
+    st.name = name; ls.set("tp_name", name);
     try {
       if (mode === "join"){
-        const code = ($("joincode").value || "").trim().toUpperCase();
+        const code = ($("joincode").value || "").trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
         if (!code){ msg("請輸入朋友給你的房間代碼。"); return; }
         msg("加入中…");
         const ex = await get(ref(st.db, `rooms/${code}/created`));
         if (!ex.exists()){ msg("找不到房間 " + code + "，請確認代碼。"); return; }
-        if (!(await joinRoom(code))){ msg("房間 " + code + " 已經有兩個人了。"); return; }
+        if (!(await joinRoom(code))){ msg(`房間 ${code} 已經滿 ${MAX} 個人了。`); return; }
         st.lobbyMsg = ""; enterRoom(code);
       } else {
         msg("建立中…");
@@ -426,45 +505,54 @@ document.addEventListener("submit", async ev => {
   }
   const input = form.querySelector("input"), word = (input.value || "").trim().slice(0, 20);
   if (!word){ input.focus(); return; }
-  const d = derive(); if (d.phase !== "play") return;
-  write(() => set(pRef("w/" + d.k), word));
+  const d = derive(); if (d.phase !== "play" || !d.amIn) return;
+  write(() => set(R(`words/g${d.n}/r${d.r}/${pid}`), word));
 });
 
 // ---------- record image ----------
-const IMG = { bg:"#EEF0F4", card:"#FFFFFF", fg:"#1C2130", muted:"#646B7D", a:"#D9572B", aSoft:"#FBE7DE", b:"#2A63C9", bSoft:"#E1EAFA", ok:"#1F8A5B", okSoft:"#DDF2E7" };
+const IMG = { bg:"#EEF0F4", card:"#FFFFFF", fg:"#1C2130", muted:"#646B7D", ok:"#1F8A5B", okSoft:"#DDF2E7",
+  p:["#D9572B","#2A63C9","#7E46C4","#A87412","#16807F","#C2366E"], s:["#FBE7DE","#E1EAFA","#EEE4FA","#F6ECD6","#DBF1F0","#FAE1EA"] };
 const WORD = '"LXGW WenKai TC","Kaiti TC",serif', TITLE = '"Noto Serif TC","Songti TC",serif', UI = '"Noto Sans TC","PingFang TC",sans-serif';
 function rr(c,x,y,w,h,r){ c.beginPath(); c.moveTo(x+r,y); c.arcTo(x+w,y,x+w,y+h,r); c.arcTo(x+w,y+h,x,y+h,r); c.arcTo(x,y+h,x,y,r); c.arcTo(x,y,x+w,y,r); c.closePath(); }
-function fit(c, text, maxW, size, weight, fam){ let s = size; do { c.font = `${weight} ${s}px ${fam}`; if (c.measureText(text).width <= maxW) break; s -= 2; } while (s > 16); }
+function fit(c, text, maxW, size, weight, fam){ let s = size; do { c.font = `${weight} ${s}px ${fam}`; if (c.measureText(text).width <= maxW) break; s -= 2; } while (s > 14); }
 async function drawRecord(){
   const d = derive(); if (d.phase !== "won") return null;
-  const rows = d.rounds, w = rows[rows.length-1], nA = nameOf(d.A,0), nB = nameOf(d.B,1);
-  const head1 = w.exact ? `你們在第 ${w.r} 輪寫出了同一個詞` : `第 ${w.r} 輪，你們都認定意思一樣`;
-  try { await Promise.all([ document.fonts.load(`700 48px ${WORD}`, rows.map(x => x.a + x.b).join("") + head1),
-    document.fonts.load(`900 84px ${TITLE}`, "心電感應"), document.fonts.load(`500 30px ${UI}`, nA + nB + "第局共輪房間0123456789/·心電感應兩人各寫一個詞直到寫出同一個"), document.fonts.ready ]); } catch(e){}
-  const W = 1080, P = 72, rowH = 132, head = 420, foot = 150, H = head + rows.length * rowH + foot;
+  const rows = d.rounds, w = d.row;
+  const people = [...new Set(rows.flatMap(x => x.words.map(y => y.id)))];
+  const head1 = w.exact ? `${w.words.length} 個人在第 ${w.r} 輪寫出了同一個詞` : `第 ${w.r} 輪，大家都認定意思一樣`;
+  try { await Promise.all([ document.fonts.load(`700 44px ${WORD}`, rows.map(x => x.words.map(y => y.w).join("")).join("") + head1),
+    document.fonts.load(`900 84px ${TITLE}`, "心電感應"), document.fonts.load(`500 28px ${UI}`, people.map(label).join("") + "第局共輪房間0123456789/·心電感應大家各寫一個詞直到全部人寫出同一個"), document.fonts.ready ]); } catch(e){}
+  const W = 1080, P = 72, X0 = P + 64, areaW = W - P - X0, tagH = 92, gapY = 12, gapX = 14;
+  const layout = rows.map(x => { const k = x.words.length, cols = k <= 2 ? k : (k === 4 ? 2 : 3), lines = Math.ceil(k / cols); return { cols, lines, h: lines * tagH + (lines - 1) * gapY }; });
+  const head = 420, foot = 150, H = head + layout.reduce((a, l) => a + l.h + 28, 0) + foot;
   const cv = document.createElement("canvas"); cv.width = W; cv.height = H;
   const c = cv.getContext("2d"); c.textBaseline = "middle"; c.textAlign = "center";
   c.fillStyle = IMG.bg; c.fillRect(0,0,W,H); c.fillStyle = IMG.card; rr(c, 36, 36, W-72, H-72, 40); c.fill();
   c.font = `900 84px ${TITLE}`;
   const w1 = c.measureText("心電").width, w2 = c.measureText("感應").width, tx = (W - w1 - w2) / 2;
-  c.textAlign = "left"; c.fillStyle = IMG.a; c.fillText("心電", tx, 140); c.fillStyle = IMG.b; c.fillText("感應", tx + w1, 140); c.textAlign = "center";
+  c.textAlign = "left"; c.fillStyle = IMG.p[0]; c.fillText("心電", tx, 140); c.fillStyle = IMG.p[1]; c.fillText("感應", tx + w1, 140); c.textAlign = "center";
   const dt = new Date();
-  c.fillStyle = IMG.muted; c.font = `500 30px ${UI}`; c.fillText(`房間 ${st.code} · 第 ${d.g} 局 · 共 ${w.r} 輪 · ${dt.getFullYear()}/${dt.getMonth()+1}/${dt.getDate()}`, W/2, 218);
-  c.fillStyle = IMG.fg; fit(c, head1, W-2*P-40, 46, 700, WORD); c.fillText(head1, W/2, 290);
-  const colW = (W - 2*P - 64 - 80) / 2, xA = P + 96, xB = xA + colW + 80;
-  c.fillStyle = IMG.a; fit(c, nA, colW, 26, 500, UI); c.fillText(nA, xA + colW/2, 372);
-  c.fillStyle = IMG.b; fit(c, nB, colW, 26, 500, UI); c.fillText(nB, xB + colW/2, 372);
+  c.fillStyle = IMG.muted; c.font = `500 30px ${UI}`; c.fillText(`房間 ${st.code} · 第 ${d.n} 局 · 共 ${w.r} 輪 · ${dt.getFullYear()}/${dt.getMonth()+1}/${dt.getDate()}`, W/2, 218);
+  c.fillStyle = IMG.fg; fit(c, head1, W - 2*P - 40, 46, 700, WORD); c.fillText(head1, W/2, 290);
+  // legend
+  let fs = 26; const legend = () => people.reduce((a, id) => { c.font = `500 ${fs}px ${UI}`; return a + 26 + c.measureText(label(id)).width + 28; }, -28);
+  while (legend() > W - 2*P && fs > 16) fs -= 2;
+  let lx = (W - legend()) / 2; c.textAlign = "left"; c.font = `500 ${fs}px ${UI}`;
+  for (const id of people){ const { c: ci } = info(id); c.fillStyle = IMG.p[ci]; c.beginPath(); c.arc(lx + 9, 362, 9, 0, Math.PI*2); c.fill(); lx += 26; c.fillText(label(id), lx, 364); lx += c.measureText(label(id)).width + 28; }
+  c.textAlign = "center";
+  let y = head;
   rows.forEach((x, i) => {
-    const y = head + i * rowH, h = rowH - 24, win = x.r === w.r;
-    c.fillStyle = IMG.muted; c.font = `500 26px ${UI}`; c.fillText(String(x.r), P + 24, y + h/2);
-    c.fillStyle = win ? IMG.okSoft : IMG.aSoft; rr(c, xA, y, colW, h, 22); c.fill();
-    c.fillStyle = win ? IMG.okSoft : IMG.bSoft; rr(c, xB, y, colW, h, 22); c.fill();
-    if (win){ c.strokeStyle = IMG.ok; c.lineWidth = 3; rr(c, xA, y, colW, h, 22); c.stroke(); rr(c, xB, y, colW, h, 22); c.stroke(); }
-    c.fillStyle = IMG.a; fit(c, x.a, colW - 36, 48, 700, WORD); c.fillText(x.a, xA + colW/2, y + h/2 + 2);
-    c.fillStyle = IMG.b; fit(c, x.b, colW - 36, 48, 700, WORD); c.fillText(x.b, xB + colW/2, y + h/2 + 2);
-    c.fillStyle = win ? IMG.ok : IMG.muted; c.font = `700 ${win?40:32}px ${UI}`; c.fillText(win ? "＝" : "×", xA + colW + 40, y + h/2);
+    const L = layout[i], win = x.r === w.r, tagW = (areaW - (L.cols - 1) * gapX) / L.cols;
+    c.fillStyle = IMG.muted; c.font = `500 26px ${UI}`; c.fillText(String(x.r), P + 22, y + L.h / 2);
+    x.words.forEach((wd, j) => {
+      const col = j % L.cols, line = Math.floor(j / L.cols), tx2 = X0 + col * (tagW + gapX), ty = y + line * (tagH + gapY), ci = info(wd.id).c;
+      c.fillStyle = win ? IMG.okSoft : IMG.s[ci]; rr(c, tx2, ty, tagW, tagH, 20); c.fill();
+      if (win){ c.strokeStyle = IMG.ok; c.lineWidth = 3; rr(c, tx2, ty, tagW, tagH, 20); c.stroke(); }
+      c.fillStyle = IMG.p[ci]; fit(c, wd.w, tagW - 28, 42, 700, WORD); c.fillText(wd.w, tx2 + tagW / 2, ty + tagH / 2 + 2);
+    });
+    y += L.h + 28;
   });
-  c.fillStyle = IMG.muted; c.font = `400 24px ${UI}`; c.fillText("心電感應 · 兩人各寫一個詞，直到寫出同一個", W/2, H - 100);
+  c.fillStyle = IMG.muted; c.font = `400 24px ${UI}`; c.fillText("心電感應 · 大家各寫一個詞，直到全部人寫出同一個", W/2, H - 100);
   return await new Promise(res => cv.toBlob(res, "image/png"));
 }
 function renderModal(){
@@ -474,7 +562,7 @@ function renderModal(){
   m.innerHTML = `<div class="sheet" role="dialog" aria-label="紀錄圖片">
     <div class="imgbox">${st.preview.url ? `<img src="${st.preview.url}" alt="這一局的聯想軌跡圖片">` : `<p class="hint" style="padding:40px 0">正在畫圖…</p>`}</div>
     <p class="hint">${esc(st.imgMsg || "按「儲存圖片」，或長按圖片儲存。")}</p>
-    <div class="row"><button class="primary" data-act="img-save" ${st.preview.url?"":"disabled"}>儲存圖片</button><button class="ghost" data-act="img-close">關閉</button></div></div>`;
+    <div class="row"><button class="primary" data-act="img-save" ${st.preview.url ? "" : "disabled"}>儲存圖片</button><button class="ghost" data-act="img-close">關閉</button></div></div>`;
 }
 async function openPreview(){
   st.imgMsg = ""; st.preview = { url:null, blob:null }; renderModal();
@@ -503,7 +591,7 @@ setInterval(() => { if (st.players.some(p => p.say && p.say.at && now() - p.say.
   onValue(ref(st.db, ".info/serverTimeOffset"), s => { st.offset = s.val() || 0; });
   onValue(ref(st.db, ".info/connected"), s => {
     if (s.val() === true && st.code && st.players.some(p => p.id === pid)){
-      set(pRef("online"), true).catch(()=>{}); onDisconnect(pRef("online")).set(false);
+      set(pRef("online"), true).catch(() => {}); onDisconnect(pRef("online")).set(false);
     }
   });
   const q = new URLSearchParams(location.search).get("room");
@@ -514,6 +602,5 @@ setInterval(() => { if (st.players.some(p => p.say && p.say.at && now() - p.say.
   } else render();
 })();
 </script>
-
 </body>
 </html>
